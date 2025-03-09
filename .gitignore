@@ -23,3 +23,10 @@ go.work.sum
 
 # env file
 .env
+
+# folders with temporary build files
+bin/
+tmp/
+
+# vs-code settings
+.vscode/

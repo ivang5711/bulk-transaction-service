@@ -1,0 +1,11 @@
+services:
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: bts
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: btsdb
+    ports:
+      - 5432:5432
