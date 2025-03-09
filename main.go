@@ -1,6 +1,8 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -16,6 +18,21 @@ type config struct {
 	Server                   struct {
 		Port string
 	}
+}
+
+type Transaction struct {
+	Amount           string `json:"amount"`
+	CounterpartyName string `json:"counterparty_name"`
+	CounterpartyBic  string `json:"counterparty_bic"`
+	CounterpartyIban string `json:"counterparty_iban"`
+	Description      string `json:"description"`
+}
+
+type BulkTransaction struct {
+	OrganizationName string        `json:"organization_name"`
+	OrganizationBic  string        `json:"organization_bic"`
+	OrganizationIban string        `json:"organization_iban"`
+	CreditTransfers  []Transaction `json:"credit_transfers"`
 }
 
 func main() {
@@ -38,7 +55,7 @@ func main() {
 
 	// setup server
 	e := echo.New()
-	e.GET("/", handleGetAccount)
+	e.POST("/salaries", handlePostAccount)
 
 	// start server
 	e.Logger.Fatal(e.Start(cfg.Server.Port))
@@ -57,13 +74,30 @@ func loadEnvConfig() (config, error) {
 	return cfg, nil
 }
 
-func handleGetAccount(c echo.Context) error {
-	// TODO: Implement handleGetAccount function
-	return c.String(http.StatusOK, "handle get account function!")
+func handlePostAccount(c echo.Context) error {
+	err := validateRequest(c)
+	if err != nil {
+		return c.String(http.StatusUnprocessableEntity,
+			err.Error())
+	}
+
+	bt := new(BulkTransaction)
+	if err = c.Bind(bt); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return c.String(http.StatusCreated, http.StatusText(http.StatusCreated))
+}
+
+func validateRequest(c echo.Context) error {
+	if v := c.Request().ContentLength <= 0; v {
+		errMsg := fmt.Sprintf("Request was empty. Content length = %v\n",
+			c.Request().ContentLength)
+		fmt.Printf("%s\n", errMsg)
+		return errors.New(errMsg)
+	}
+	return nil
 }
 
 // TODO: Implement bulk transfer handler
-// 1. Verify the validity of the request
-// 2. In case the request must be denied return 422 http status code
 // 3. In successfull case add transfet to db, update customer's balance and
 // 	  return 201 http status code.
