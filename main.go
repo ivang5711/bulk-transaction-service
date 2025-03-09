@@ -61,3 +61,9 @@ func handleGetAccount(c echo.Context) error {
 	// TODO: Implement handleGetAccount function
 	return c.String(http.StatusOK, "handle get account function!")
 }
+
+// TODO: Implement bulk transfer handler
+// 1. Verify the validity of the request
+// 2. In case the request must be denied return 422 http status code
+// 3. In successfull case add transfet to db, update customer's balance and
+// 	  return 201 http status code.

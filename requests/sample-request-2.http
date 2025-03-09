@@ -1,4 +1,4 @@
-POST  http://localhost:5067/Salaries
+POST  http://localhost:3838/Salaries
 Content-Type: application/json
 
 
